@@ -31,10 +31,10 @@ app.get('/api/feed', async (c) => {
 
             // Create a native Response object with the proper Cache-Control headers
             // max-age=60 prevents the browser from fetching on reload.
-            // s-maxage=60 tells Cloudflare's CDN and Cache API to cache it for 60s.
+            // s-maxage=31536000 (1 year) tells Cloudflare's CDN and Cache API to keep it forever until purged.
             response = Response.json(payload, {
                 headers: {
-                    'Cache-Control': 'public, max-age=60, s-maxage=60'
+                    'Cache-Control': 'public, max-age=60, s-maxage=31536000'
                 }
             });
 
