@@ -20,13 +20,15 @@ export function FeedViewer() {
                 setData(mockThreatData);
             });
 
-        // Setup polling every 10 seconds for live updates
+        // Setup polling every 60 seconds for live updates.
+        // This matches the KV and Edge cache lifetimes (cacheTtl: 60) to prevent
+        // wasted requests that would just return cached data.
         const interval = setInterval(() => {
             fetch("/api/feed")
                 .then((res) => res.json())
                 .then((json) => setData(json))
                 .catch(console.error);
-        }, 10000);
+        }, 60000);
 
         return () => clearInterval(interval);
     }, []);
