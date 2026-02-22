@@ -10,7 +10,14 @@ const app = new Hono<{ Bindings: Env }>()
 
 app.get('/api/feed', async (c) => {
     try {
-        const dataString = await c.env.THREAT_FEED_KV.get('current_feed');
+        // cacheTtl: 60 tells Cloudflare's regional edge nodes to cache the KV read
+        // for 60 seconds. This drastically reduces reads to the central KV store.
+        const dataString = await c.env.THREAT_FEED_KV.get('current_feed', { cacheTtl: 60 });
+
+        // s-maxage=60 tells Cloudflare's CDN edge to cache the HTTP response for 60 seconds,
+        // preventing the Worker from invoking at all.
+        c.header('Cache-Control', 'public, s-maxage=60');
+
         if (dataString) {
             return c.json(JSON.parse(dataString));
         }
