@@ -13,6 +13,16 @@
         "directory": "./out",
         "binding": "ASSETS"
     },
+    "routes": [
+        {
+            "pattern": "blueteamarchive.com",
+            "custom_domain": true
+        },
+        {
+            "pattern": "www.blueteamarchive.com",
+            "custom_domain": true
+        }
+    ],
     "kv_namespaces": [
         {
             "binding": "THREAT_FEED_KV",
