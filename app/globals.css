@@ -1,0 +1,70 @@
+@import "@fontsource/jura/400.css";
+@import "@fontsource/jura/700.css";
+@import "@fontsource/fira-code/400.css";
+@import "@fontsource/fira-code/700.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@layer base {
+
+  :root,
+  .dark {
+    --background: 212 100% 5%;
+    /* #000B18 - Deep void blue */
+    --foreground: 210 20% 98%;
+
+    --card: 215 48% 6%;
+    /* Slightly lighter than background */
+    --card-foreground: 210 20% 98%;
+
+    --popover: 215 48% 6%;
+    --popover-foreground: 210 20% 98%;
+
+    --primary: 186 100% 50%;
+    /* #00E5FF - Striking Cyan/Teal */
+    --primary-foreground: 212 100% 5%;
+    /* Dark text on primary */
+
+    --secondary: 217 60% 15%;
+    /* #0F2039 - Dull navy */
+    --secondary-foreground: 186 100% 80%;
+    /* Washed out cyan */
+
+    --muted: 217 60% 15%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217 60% 15%;
+    --accent-foreground: 210 20% 98%;
+
+    --destructive: 0 100% 50%;
+    /* Pure Red */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 219 49% 20%;
+    /* #1A2B4C - Stark borders */
+    --input: 219 49% 20%;
+
+    --ring: 186 100% 50%;
+
+    --radius: 0px;
+    /* Brutalist sharp edges */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased font-sans selection:bg-primary selection:text-primary-foreground;
+  }
+}

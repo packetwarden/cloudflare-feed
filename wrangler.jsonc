@@ -1,0 +1,22 @@
+{
+    "name": "threat-feed",
+    "main": "src/index.ts",
+    "compatibility_date": "2025-03-07",
+    "compatibility_flags": [
+        "nodejs_compat"
+    ],
+    "observability": {
+        "enabled": true,
+        "head_sampling_rate": 1
+    },
+    "assets": {
+        "directory": "./out",
+        "binding": "ASSETS"
+    },
+    "kv_namespaces": [
+        {
+            "binding": "THREAT_FEED_KV",
+            "id": "3178d33f01a94dd398711f2a340eabba"
+        }
+    ]
+}
