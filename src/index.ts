@@ -9,24 +9,45 @@ export interface Env {
 const app = new Hono<{ Bindings: Env }>()
 
 app.get('/api/feed', async (c) => {
+    // @ts-expect-error Cloudflare specific CacheStorage extension 
+    const cache = caches.default as Cache;
+    // Create a Request object from the current URL to serve as the cache key
+    const cacheKey = new Request(c.req.url);
+
     try {
-        // cacheTtl: 60 tells Cloudflare's regional edge nodes to cache the KV read
-        // for 60 seconds. This drastically reduces reads to the central KV store.
-        const dataString = await c.env.THREAT_FEED_KV.get('current_feed', { cacheTtl: 60 });
+        // 1. Check if the response is already in the edge cache
+        let response = await cache.match(cacheKey);
 
-        // s-maxage=60 tells Cloudflare's CDN edge to cache the HTTP response for 60 seconds,
-        // preventing the Worker from invoking at all.
-        c.header('Cache-Control', 'public, s-maxage=60');
+        if (!response) {
+            console.log('Cache API miss. Reading from KV store...');
 
-        if (dataString) {
-            return c.json(JSON.parse(dataString));
+            // cacheTtl: 60 reduces reads to the central KV store globally
+            const dataString = await c.env.THREAT_FEED_KV.get('current_feed', { cacheTtl: 60 });
+
+            let payload = mockThreatData;
+            if (dataString) {
+                payload = JSON.parse(dataString);
+            }
+
+            // Create a native Response object with the proper Cache-Control headers
+            // max-age=60 prevents the browser from fetching on reload.
+            // s-maxage=60 tells Cloudflare's CDN and Cache API to cache it for 60s.
+            response = Response.json(payload, {
+                headers: {
+                    'Cache-Control': 'public, max-age=60, s-maxage=60'
+                }
+            });
+
+            // 2. Store the cloned response in the Edge Cache non-blockingly
+            c.executionCtx.waitUntil(cache.put(cacheKey, response.clone()));
+        } else {
+            console.log('Cache API hit! Returning from edge memory.');
         }
 
-        // Fallback to mock data if KV is empty
-        return c.json(mockThreatData);
+        return response;
     } catch (error) {
         console.error('Error fetching threat data:', error);
-        // Return mock data for local dev without KV configured
+        // Fallback to mock data (without caching it, so we can recover later)
         return c.json(mockThreatData);
     }
 })
